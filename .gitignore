@@ -1,0 +1,4 @@
+
+# Large embedding files
+data/processed/chunks_bge.parquet
+data/processed/chunks_e5.parquet
