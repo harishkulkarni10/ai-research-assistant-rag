@@ -1,4 +1,15 @@
+# Python
+__pycache__/
+.venv/
 
-# Large embedding files
-data/processed/chunks_bge.parquet
-data/processed/chunks_e5.parquet
+# Data artifacts
+*.parquet
+*.faiss
+data/processed/
+data/index/
+
+# Notebooks output
+.ipynb_checkpoints/
+
+# notes
+implementation_phases.md
