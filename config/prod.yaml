@@ -1,0 +1,11 @@
+project:
+  environment: "prod"
+
+embeddings:
+  device: "cuda"
+
+retrieval:
+  top_k: 50
+
+generation:
+  max_tokens: 512

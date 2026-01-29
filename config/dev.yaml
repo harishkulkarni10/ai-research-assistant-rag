@@ -1,0 +1,12 @@
+project:
+  environment: "dev"
+
+embeddings:
+  device: "cpu"
+  batch_size: 16
+
+retrieval:
+  top_k: 20
+
+generation:
+  max_tokens: 256

@@ -1,0 +1,58 @@
+# ===============================================
+# Global RAG configuration
+# ===============================================
+
+project:
+  name: "ai-research-assistant-rag"
+  environment: "dev"
+
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  vector_store: "data/index"
+  logs: "logs"
+
+chunking:
+  tokenizer: "cl100k_base"
+  chunk_size_tokens: 1000
+  chunk_overlap_tokens: 200
+  min_chunk_tokens: 200
+
+embeddings:
+  model: "BAAI/bge-base-en-v1.5"
+  dimension: 768
+  normalize: true
+  device: "cuda" 
+
+vector_db:
+  provider: "chroma"
+  collection_name: "arxiv_chunks"
+  persist_directory: "data/index/chroma"
+
+retrieval:
+  top_k: 50
+
+reranking:
+  enabled: true
+  model: "BAAI/bge-reranker-base"
+  batch_size: 32
+  top_k: 10
+
+generation:
+  provider: "vllm"
+  model: "mistralai/Mistral-7B-Instruct-v0.2"
+  max_tokens: 512
+  temperature: 0.2
+
+evaluation:
+  enabled: true
+  metrics:
+    - context_recall
+    - faithfullness
+    - answer_relevancy
+    - context_precision
+
+logging:
+  level: "INFO"
+  file: "logs/app.log"
+  
