@@ -7,7 +7,7 @@ from rag_arxiv_qa.src.indexing.chroma_store import ChromaVectorStore
 
 class IngestionPipeline:
     """
-    Streaming ingestin pipeline
+    Streaming ingestion pipeline
     doc -> chunk -> embed -> store
     """
     def __init__(self, config: Dict[str, Any]):

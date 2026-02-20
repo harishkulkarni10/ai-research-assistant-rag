@@ -22,7 +22,7 @@ embeddings:
   model: "BAAI/bge-base-en-v1.5"
   dimension: 768
   normalize: true
-  device: "cuda" 
+  device: "cpu" 
 
 vector_db:
   provider: "chroma"
@@ -39,8 +39,8 @@ reranking:
   top_k: 10
 
 generation:
-  provider: "vllm"
-  model: "mistralai/Mistral-7B-Instruct-v0.2"
+  provider: "transformers"
+  model: "Qwen/Qwen2-1.5B-Instruct"
   max_tokens: 512
   temperature: 0.2
 
@@ -55,4 +55,3 @@ evaluation:
 logging:
   level: "INFO"
   file: "logs/app.log"
-  

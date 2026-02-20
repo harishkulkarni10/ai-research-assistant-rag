@@ -1,3 +1,21 @@
+# Local planning / notes (do not commit)
+local_rag_project_plan.md
+
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
 # Python
 __pycache__/
 .venv/
@@ -13,3 +31,9 @@ data/index/
 
 # notes
 implementation_phases.md
+
+.env
+mlruns/
+*.pyc
+__pycache__/
+*.log
