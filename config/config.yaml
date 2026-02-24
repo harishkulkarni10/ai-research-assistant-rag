@@ -19,10 +19,15 @@ chunking:
   min_chunk_tokens: 200
 
 embeddings:
-  model: "BAAI/bge-base-en-v1.5"
-  dimension: 768
+  # Original model (larger, may cause segfaults on Windows):
+  # model: "BAAI/bge-base-en-v1.5"
+  # dimension: 768
+  # Using smaller, more stable model for Windows compatibility:
+  model: "sentence-transformers/all-MiniLM-L6-v2"
+  dimension: 384
   normalize: true
-  device: "cpu" 
+  device: "cpu"
+  batch_size: 8 
 
 vector_db:
   provider: "chroma"
@@ -39,10 +44,22 @@ reranking:
   top_k: 10
 
 generation:
-  provider: "transformers"
-  model: "Qwen/Qwen2-1.5B-Instruct"
+  # Provider options: "ollama" (local CPU), "huggingface" (API), "vllm" (GPU fast), "tgi" (GPU serving), "transformers" (local fallback)
+  provider: "ollama"
+  # For Ollama: use model names like "llama3.2:1b", "mistral", "qwen2.5:1.5b"
+  # For HuggingFace: use model IDs like "mistralai/Mistral-7B-Instruct-v0.2", "meta-llama/Llama-3.2-1B-Instruct"
+  # For vLLM/TGI: use model IDs like "mistralai/Mistral-7B-Instruct-v0.2"
+  model: "llama3.2:1b"
   max_tokens: 512
   temperature: 0.2
+  # Ollama-specific
+  base_url: "http://localhost:11434"
+  # vLLM-specific (default: http://localhost:8000)
+  # base_url: "http://localhost:8000"
+  # TGI-specific (default: http://localhost:8080)
+  # base_url: "http://localhost:8080"
+  # HuggingFace-specific (optional, can use env var HUGGINGFACE_API_KEY)
+  # api_key: ""  # Set via environment variable or .env file
 
 evaluation:
   enabled: true

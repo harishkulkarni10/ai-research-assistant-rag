@@ -1,5 +1,6 @@
 from typing import Iterable, Dict, Any
 from tqdm import tqdm 
+import gc
 
 from rag_arxiv_qa.src.chunking.chunker import Chunker
 from rag_arxiv_qa.src.embeddings.embedder import Embedder
@@ -15,70 +16,66 @@ class IngestionPipeline:
         self.embedder = Embedder(config)
         self.vector_store = ChromaVectorStore(config)
 
-        self.embed_batch_size = config["embeddings"].get("batch_size", 32)
+        # Process one document at a time to avoid segfaults
+        self.embed_batch_size = 4
 
     def ingest(self, documents: Iterable[Dict[str, Any]]) -> None:
         """
         Run ingestion over a stream of documents.
-
-        Parameters
-        ----------
-        documents : Iterable[dict]
-            Each document must have:
-            - doc_id
-            - text
-            - metadata
+        Processes one chunk at a time to avoid segfaults on Windows.
         """
-
-        buffer_chunks = []
-        buffer_metadatas = []
-        buffer_texts = []
-        buffer_ids = []
+        processed_count = 0
+        error_count = 0
+        total_chunks = 0
 
         for doc in tqdm(documents, desc="Ingesting documents"):
-            for chunk in self.chunker.chunk_document(
-                doc_id=doc["doc_id"],
-                text=doc["text"],
-                base_metadata=doc["metadata"],
-            ):
-                buffer_texts.append(chunk["text"])
-                buffer_ids.append(chunk["chunk_id"])
-                buffer_metadatas.append(chunk["metadata"])
-                buffer_chunks.append(chunk)
-
-                if len(buffer_texts) >= self.embed_batch_size:
-                    self._flush(
-                        buffer_texts,
-                        buffer_ids,
-                        buffer_metadatas,
-                    )
-                    buffer_texts.clear()
-                    buffer_ids.clear()
-                    buffer_metadatas.clear()
-                    buffer_chunks.clear()
-
-        # Flush remaining chunks
-        if buffer_texts:
-            self._flush(
-                buffer_texts,
-                buffer_ids,
-                buffer_metadatas,
-            )
-
-    def _flush(
-        self,
-        texts: list[str],
-        ids: list[str],
-        metadatas: list[Dict[str, Any]],
-    ) -> None:
-        """
-        Embed and upsert a batch.
-        """
-        embeddings = self.embedder.embed_documents(texts)
-
-        self.vector_store.upsert(
-            ids=ids,
-            embeddings=embeddings.tolist(),
-            documents=texts,
-            metadatas=metadatas,
-        )
+            try:
+                # Process one document at a time: chunk -> embed -> store
+                chunks = list(self.chunker.chunk_document(
+                    doc_id=doc["doc_id"],
+                    text=doc["text"],
+                    base_metadata=doc["metadata"],
+                ))
+                
+                if not chunks:
+                    continue
+                
+                # Process ONE chunk at a time to avoid segfaults
+                for chunk in chunks:
+                    try:
+                        # Embed single chunk
+                        embedding = self.embedder.embed_documents([chunk["text"]])
+                        
+                        # Store immediately
+                        self.vector_store.upsert(
+                            ids=[chunk["chunk_id"]],
+                            embeddings=embedding.tolist(),
+                            documents=[chunk["text"]],
+                            metadatas=[chunk["metadata"]],
+                        )
+                        
+                        total_chunks += 1
+                        
+                        # Aggressive cleanup after each chunk
+                        del embedding
+                        gc.collect()
+                        
+                    except Exception as e:
+                        print(f"\nWarning: Failed to process chunk {chunk.get('chunk_id', 'unknown')}: {e}")
+                        gc.collect()
+                        continue
+                
+                processed_count += 1
+                
+                # Force garbage collection after each document
+                gc.collect()
+                
+            except Exception as e:
+                error_count += 1
+                print(f"\nWarning: Failed to process document {doc.get('doc_id', 'unknown')}: {e}")
+                gc.collect()
+                continue
+        
+        print(f"\nCompleted: {processed_count} documents, {total_chunks} chunks")
+        if error_count > 0:
+            print(f"Errors: {error_count} documents failed")

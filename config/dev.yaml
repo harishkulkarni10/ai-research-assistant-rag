@@ -9,7 +9,10 @@ retrieval:
   top_k: 20
 
 generation:
+  provider: "ollama"
+  model: "llama3.2:1b"
   max_tokens: 256
+  base_url: "http://localhost:11434"
   
 chunking:
   min_chunk_tokens: 1

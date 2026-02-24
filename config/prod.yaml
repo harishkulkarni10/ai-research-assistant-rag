@@ -8,4 +8,9 @@ retrieval:
   top_k: 50
 
 generation:
+  # Use HuggingFace API for production 
+  provider: "huggingface"
+  # Use a small, fast model for production
+  model: "mistralai/Mistral-7B-Instruct-v0.2"
   max_tokens: 512
+  # API key should be set via environment variable: HUGGINGFACE_API_KEY

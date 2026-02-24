@@ -1,39 +1,72 @@
-# Local planning / notes (do not commit)
-local_rag_project_plan.md
-
-# Virtual environment
-.venv/
-
-# Python cache
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# VSCode / IDE
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# OS files
+# Environment variables
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Data (keep structure, ignore raw data)
+data/raw/*
+!data/raw/.gitkeep
+data/index/chroma/*
+!data/index/chroma/.gitkeep
+rag_arxiv_qa/data/processed/*.parquet
+rag_arxiv_qa/data/processed/*.bin
+rag_arxiv_qa/data/processed/*.sqlite3
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
 .DS_Store
 Thumbs.db
 
-# Python
-__pycache__/
-.venv/
+# Model cache (optional, can be large)
+.cache/
+models/
 
-# Data artifacts
-*.parquet
-*.faiss
-data/processed/
-data/index/
-
-# Notebooks output
-.ipynb_checkpoints/
-
-# notes
+local_rag_project_plan.md
 implementation_phases.md
-
-.env
-mlruns/
-*.pyc
-__pycache__/
-*.log
+DEPLOYMENT.md

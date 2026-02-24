@@ -23,9 +23,26 @@ class Embedder:
         """
         Embed a batch of document texts.
         """
+        # Use very small batch size to avoid segfaults on Windows
+        effective_batch_size = min(self.batch_size, 4)
+        
+        # Process one at a time if batch is very small to avoid issues
+        if len(texts) <= 2:
+            embeddings_list = []
+            for text in texts:
+                emb = self.model.encode(
+                    [text],
+                    batch_size=1,
+                    show_progress_bar=False,
+                    convert_to_numpy=True,
+                    normalize_embeddings=self.normalize,
+                )
+                embeddings_list.append(emb[0])
+            return np.array(embeddings_list)
+        
         embeddings = self.model.encode(
             texts,
-            batch_size=self.batch_size,
+            batch_size=effective_batch_size,
             show_progress_bar=False,
             convert_to_numpy=True,
             normalize_embeddings=self.normalize,
