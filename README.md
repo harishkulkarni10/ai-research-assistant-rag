@@ -145,6 +145,37 @@ API will be available at:
 python test_rag_service.py
 ```
 
+## Example Queries
+
+Here are some example queries you can try:
+
+**Via Streamlit UI:**
+- "What are Transformers in machine learning?"
+- "Explain the attention mechanism in detail"
+- "What are the latest advances in RAG systems?"
+- "How do large language models work?"
+- "Compare BERT and GPT architectures"
+
+**Via API:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/query" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What are Transformers?", "top_k": 5}'
+```
+
+**Via Python:**
+```python
+from rag_arxiv_qa.src.services.rag_service import RAGService
+from rag_arxiv_qa.src.utils.config import load_config
+
+config = load_config()
+rag_service = RAGService(config)
+
+response = rag_service.answer("What are Transformers?")
+print(response.answer)
+print(f"Citations: {response.citations}")
+```
+
 ### Option 4: Docker Compose
 
 ```bash
